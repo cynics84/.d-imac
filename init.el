@@ -171,6 +171,49 @@
 (require 'init-local nil t)
 
 (provide 'init)
+;;; self build begin
+;;更改字体
+(add-to-list 'default-frame-alist
+             '(font . "LXGW WenKai Mono-18"))
+;;socks
+(setq url-gateway-method 'socks)
+
+;;slime
+(require 'slime)
+
+
+;; rime
+(require 'rime)
+(require 'posframe)
+(setq rime-user-data-dir "/Users/baoyingzhe/Library/Rime")
+
+(setq rime-posframe-properties
+      (list :background-color "#333333"
+            :foreground-color "#dcdccc"
+            :font "FZJuZhenXinFangS-R-GB-14"
+            :internal-border-width 10))
+
+(setq default-input-method "rime"
+      rime-show-candidate 'posframe)
+(setq rime-librime-root "/Users/baoyingzhe/.emacs.d/librime/dist")
+(setq rime-disable-predicates
+      '(rime-predicate-evil-mode-p
+        rime-predicate-after-alphabet-char-p
+        rime-predicate-prog-in-code-p))
+(require 'use-package) ;还是需要use package, 还是需要改进
+(use-package rime
+  :bind
+  (:map rime-mode-map
+        ("C-`" . 'rime-send-keybinding)))
+
+;;安装org-roam
+(setq org-roam-directory (file-truename "/Users/baoyingzhe/Library/CloudStorage/OneDrive-个人/org-roam"))
+(org-roam-db-autosync-mode)
+
+;;pdf-tools 启动
+(pdf-tools-install)
+;;; end of self build
+
 
 ;; Local Variables:
 ;; coding: utf-8
