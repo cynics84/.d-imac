@@ -180,7 +180,9 @@
 
 ;;slime
 (require 'slime)
-
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lisp . t)))
 
 ;; rime
 (require 'rime)
@@ -207,11 +209,57 @@
         ("C-`" . 'rime-send-keybinding)))
 
 ;;安装org-roam
-(setq org-roam-directory (file-truename "/Users/baoyingzhe/Library/CloudStorage/OneDrive-个人/org-roam"))
-(org-roam-db-autosync-mode)
-
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "/Users/baoyingzhe/Library/CloudStorage/GoogleDrive-baoyingzhe@gmail.com/我的云端硬盘/Re/org-roam")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point)
+         :map org-roam-dailies-map
+         ("Y" . org-roam-dailies-capture-yesterday)
+         ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :config
+  (require 'org-roam-dailies) ;; Ensure the keymap is available
+  (org-roam-db-autosync-mode))
 ;;pdf-tools 启动
 (pdf-tools-install)
+
+;;shrface 设置
+
+(use-package shrface
+  :defer t
+  :config
+  (shrface-basic)
+  (shrface-trial)
+  (shrface-default-keybindings) ; setup default keybindings
+  (setq shrface-href-versatile t))
+
+(use-package eww
+  :defer t
+  :init
+  (add-hook 'eww-after-render-hook #'shrface-mode)
+  :config
+  (require 'shrface))
+
+(use-package nov
+  :defer t
+  :init
+  (add-hook 'nov-mode-hook #'shrface-mode)
+  :config
+  (require 'shrface)
+  (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+  (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
+
+
+
 ;;; end of self build
 
 
