@@ -171,50 +171,66 @@
 (require 'init-local nil t)
 
 (provide 'init)
-;;; self build begin
-;;更改字体
-(add-to-list 'default-frame-alist
-             '(font . "LXGW WenKai Mono-18"))
-;;socks
-(setq url-gateway-method 'socks)
 
-;;slime
-(require 'slime)
+;;self-build block begin
+;;slime-company backend
+(slime-setup '(slime-fancy slime-company))
+(use-package slime-company
+  :after (slime company)
+  :config (setq slime-company-completion 'fuzzy
+                slime-company-after-completion 'slime-company-just-one-space))
+(define-key company-active-map (kbd "\C-n") 'company-select-next)
+(define-key company-active-map (kbd "\C-p") 'company-select-previous)
+(define-key company-active-map (kbd "\C-d") 'company-show-doc-buffer)
+(define-key company-active-map (kbd "M-.") 'company-show-location)
+
+;;bable -lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((lisp . t)))
-
-;; rime
-(require 'rime)
+ '((lisp . t)) )
+;; slime -> hyperspec
+(eval-after-load "slime"
+  '(progn
+     (setq common-lisp-hyperspec-root
+           "/usr/local/share/doc/hyperspec/HyperSpec/")
+     (setq common-lisp-hyperspec-symbol-table
+           (concat common-lisp-hyperspec-root "Data/Map_Sym.txt")
+           )
+     (setq common-lisp-hyperspec-issuex-table
+           (concat common-lisp-hyperspec-root "Data/Map_IssX.txt"))))
+;;设置url-gateway为socks
+(setq url-gateway-method 'socks)
+;; pyim
 (require 'posframe)
-(setq rime-user-data-dir "/Users/baoyingzhe/Library/Rime")
+(setq default-input-method "pyim")
+(require 'pyim-basedict)
+(pyim-basedict-enable)
+(setq pyim-default-scheme 'pinyinjiajia-shuangpin)
+                                        ;:pyim tanzhen
+(global-set-key (kbd "M-j") 'pyim-convert-string-at-point)
+(setq-default pyim-english-input-switch-functions
+              '(pyim-probe-dynamic-english
+                pyim-probe-isearch-mode
+                pyim-probe-program-mode
+                pyim-probe-org-structure-template))
+(setq-default pyim-punctuation-half-width-functions
+              '(pyim-probe-punctuation-line-beginning
+                pyim-probe-punctuation-after-punctuation))
+(pyim-isearch-mode 1)
 
-(setq rime-posframe-properties
-      (list :background-color "#333333"
-            :foreground-color "#dcdccc"
-            :font "FZJuZhenXinFangS-R-GB-14"
-            :internal-border-width 10))
 
-(setq default-input-method "rime"
-      rime-show-candidate 'posframe)
-(setq rime-librime-root "/Users/baoyingzhe/.emacs.d/librime/dist")
-(setq rime-disable-predicates
-      '(rime-predicate-evil-mode-p
-        rime-predicate-after-alphabet-char-p
-        rime-predicate-prog-in-code-p))
-(require 'use-package) ;还是需要use package, 还是需要改进
-(use-package rime
-  :bind
-  (:map rime-mode-map
-        ("C-`" . 'rime-send-keybinding)))
 
+;;epub关联到nov-mode
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+;;pdf-tools 启动
+(pdf-tools-install)
 ;;安装org-roam
 (use-package org-roam
   :ensure t
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory "/Users/baoyingzhe/Library/CloudStorage/GoogleDrive-baoyingzhe@gmail.com/我的云端硬盘/Re/org-roam")
+  (org-roam-directory "/Users/byzmacair/Documents/Re/org-roam")
   (org-roam-completion-everywhere t)
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
@@ -227,41 +243,15 @@
   :bind-keymap
   ("C-c n d" . org-roam-dailies-map)
   :config
-  (require 'org-roam-dailies) ;; Ensure the keymap is available
+  (require 'org-roam-dailies)
   (org-roam-db-autosync-mode))
-;;pdf-tools 启动
-(pdf-tools-install)
-
-;;shrface 设置
-
-(use-package shrface
-  :defer t
-  :config
-  (shrface-basic)
-  (shrface-trial)
-  (shrface-default-keybindings) ; setup default keybindings
-  (setq shrface-href-versatile t))
-
-(use-package eww
-  :defer t
-  :init
-  (add-hook 'eww-after-render-hook #'shrface-mode)
-  :config
-  (require 'shrface))
-
-(use-package nov
-  :defer t
-  :init
-  (add-hook 'nov-mode-hook #'shrface-mode)
-  :config
-  (require 'shrface)
-  (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
-  (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
+;;安装valign
+(add-hook 'org-mode-hook #'valign-mode)
+;;绑定osx字典快捷键
+(global-set-key (kbd "C-$") 'osx-dictionary-search-word-at-point)
 
 
-
-;;; end of self build
-
+;;Self-build block end
 
 ;; Local Variables:
 ;; coding: utf-8
